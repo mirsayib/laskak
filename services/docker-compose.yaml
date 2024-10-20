@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  user-service:
+    build:
+      context: ./user-service
+    container_name: user-service
+    environment:
+      - PORT=5000
+      - POSTGRES_URI=postgres://sayib:Sinat@postgresql:5432/user_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - JWT_SECRET=8f4b6c2a1e9d7f3b5a0c8e6d4a2b0f1e9c7d5a3b1f0e8a6c4d2
+      - DEFAULT_DB_URI=postgres://sayib:Sinat@postgresql:5432/postgres
+      - PRODUCT_SERVICE_URL=http://product-service:5001/api/products
+      - ORDER_SERVICE_URL=http://order-service:5003/api/order
+      - PAYMENT_SERVICE_URL=http://payment-service:5004/api/payment
+      - CART_SERVICE_URL=http://shopping-cart-service:5002/api/cart
+    ports:
+      - "5000:5000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+
+  product-service:
+    build:
+      context: ./product-service
+    container_name: product-service
+    environment:
+      - PORT=5001
+      - POSTGRES_URI=postgres://sayib:Sinat@postgresql:5432/product_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - JWT_SECRET=8f4b6c2a1e9d7f3b5a0c8e6d4a2b0f1e9c7d5a3b1f0e8a6c4d2
+      - DEFAULT_DB_URI=postgres://sayib:Sinat@postgresql:5432/postgres
+      - USER_SERVICE_URL=http://user-service:5000/api/users
+      - ORDER_SERVICE_URL=http://order-service:5003/api/order
+      - PAYMENT_SERVICE_URL=http://payment-service:5004/api/payment
+      - CART_SERVICE_URL=http://shopping-cart-service:5002/api/cart
+    ports:
+      - "5001:5001"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+
+  order-service:
+    build:
+      context: ./order-service
+    container_name: order-service
+    environment:
+      - PORT=5003
+      - POSTGRES_URI=postgres://sayib:Sinat@postgresql:5432/order_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - JWT_SECRET=8f4b6c2a1e9d7f3b5a0c8e6d4a2b0f1e9c7d5a3b1f0e8a6c4d2
+      - DEFAULT_DB_URI=postgres://sayib:Sinat@postgresql:5432/postgres
+      - USER_SERVICE_URL=http://user-service:5000/api/users
+      - PRODUCT_SERVICE_URL=http://product-service:5001/api/products
+      - PAYMENT_SERVICE_URL=http://payment-service:5004/api/payment
+      - CART_SERVICE_URL=http://shopping-cart-service:5002/api/cart
+    ports:
+      - "5003:5003"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+
+  payment-service:
+    build:
+      context: ./payment-service
+    container_name: payment-service
+    environment:
+      - PORT=5004
+      - POSTGRES_URI=postgres://sayib:Sinat@postgresql:5432/payments_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - JWT_SECRET=8f4b6c2a1e9d7f3b5a0c8e6d4a2b0f1e9c7d5a3b1f0e8a6c4d2
+      - ORDER_SERVICE_URL=http://order-service:5003/api/order
+      - USER_SERVICE_URL=http://user-service:5000/api/users
+      - PRODUCT_SERVICE_URL=http://product-service:5001/api/products
+      - CART_SERVICE_URL=http://shopping-cart-service:5002/api/cart
+    ports:
+      - "5004:5004"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+
+  shopping-cart-service:
+    build:
+      context: ./shopping-cart-service
+    container_name: shopping-cart-service
+    environment:
+      - PORT=5002
+      - POSTGRES_URI=postgres://sayib:Sinat@postgresql:5432/cart_db
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - JWT_SECRET=8f4b6c2a1e9d7f3b5a0c8e6d4a2b0f1e9c7d5a3b1f0e8a6c4d2
+      - PRODUCT_SERVICE_URL=http://product-service:5001/api/products
+      - USER_SERVICE_URL=http://user-service:5000/api/users
+      - ORDER_SERVICE_URL=http://order-service:5003/api/order
+      - PAYMENT_SERVICE_URL=http://payment-service:5004/api/payment
+    ports:
+      - "5002:5002"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=XAHKJLWQOPRUSDFJKL23456ASDFGH789
+    command: sh -c "chown -R rabbitmq:rabbitmq /var/lib/rabbitmq && rabbitmq-server"
+
+  postgresql:
+    build: 
+      context: ./dockerfiles/postgres
+      dockerfile: Dockerfile
+    container_name: postgresql
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sayib"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  rabbitmq_data:

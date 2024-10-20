@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-config
+data:
+  POSTGRES_URI: postgres://sayib:Sinat@postgresql:5432/user_db
+  RABBITMQ_URL: amqp://rabbitmq:5672
+  DEFAULT_DB_URI: postgres://sayib:Sinat@postgresql:5432/postgres
+  PRODUCT_SERVICE_URL: http://product-service:5001/api/products
+  USER_SERVICE_URL: http://user-service:5000/api/users
+  PAYMENT_SERVICE_URL: http://payment-service:5004/api/payment
+  CART_SERVICE_URL: http://shopping-cart-service:5002/api/cart

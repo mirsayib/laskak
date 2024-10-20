@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  labels:
+    app: payment-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: services_payment-service:latest
+          ports:
+            - containerPort: 5004
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secret
+                  key: JWT_SECRET
+            - name: PORT
+              value: 5004
+            - name: POSTGRES_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-service-config
+                  key: POSTGRES_URI
+            - name: RABBITMQ_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-service-config
+                  key: RABBITMQ_URL
+            - name: DEFAULT_DB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-service-config
+                  key: DEFAULT_DB_URI
+            - name: PRODUCT_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-service-config
+                  key: PRODUCT_SERVICE_URL
+            - name: ORDER_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-service-config
+                  key: ORDER_SERVICE_URL
+            - name: USER_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-service-config
+                  key: USER_SERVICE_URL
+            - name: CART_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: payment-service-config
+                  key: CART_SERVICE_URL
