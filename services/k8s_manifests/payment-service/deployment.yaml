@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: payment-service
-          image: services_payment-service:latest
+          image: takemi085/laskak:payment-service
           ports:
             - containerPort: 5004
           env:

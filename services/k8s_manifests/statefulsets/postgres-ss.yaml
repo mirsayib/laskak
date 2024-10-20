@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: postgresql
-        image: localhost/services_postgresql:latest
+        image: takemi085/laskak:postgresql
         ports:
         - containerPort: 5432
         env:

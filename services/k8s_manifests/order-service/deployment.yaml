@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: services_order-service:latest
+          image: takemi085/laskak:order-service
           ports:
             - containerPort: 5003
           env:

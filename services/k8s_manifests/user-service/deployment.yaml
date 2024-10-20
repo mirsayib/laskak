@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: services_user-service:latest
+          image: takemi085/laskak:user-service
           ports:
             - containerPort: 5000
           env:
