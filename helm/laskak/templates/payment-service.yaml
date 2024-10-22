@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.payment.name }}
+  labels:
+    app: {{ .Values.services.payment.name }}
+spec:
+  replicas: {{ .Values.services.payment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.payment.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.payment.name }}
+    spec:
+      containers:
+        - name: {{ .Values.services.payment.name }}
+          image: {{ .Values.services.payment.image.repository }}:{{ .Values.services.payment.image.tag }}
+          ports:
+            - containerPort: {{ .Values.services.payment.port }}
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.services.payment.name }}-secret
+                  key: JWT_SECRET
+            - name: PORT
+              value: "{{ .Values.services.payment.port }}"
+            - name: POSTGRES_URI
+              value: {{ .Values.global.postgresql.uri }}/payments_db
+            - name: RABBITMQ_URL
+              value: {{ .Values.global.rabbitmq.url }}
+            - name: DEFAULT_DB_URI
+              value: {{ .Values.global.postgresql.uri }}/postgres
+            - name: PRODUCT_SERVICE_URL
+              value: http://{{ .Values.services.product.name }}:{{ .Values.services.product.port }}/api/products
+            - name: ORDER_SERVICE_URL
+              value: http://{{ .Values.services.order.name }}:{{ .Values.services.order.port }}/api/order
+            - name: USER_SERVICE_URL
+              value: http://{{ .Values.services.user.name }}:{{ .Values.services.user.port }}/api/users
+            - name: CART_SERVICE_URL
+              value: http://{{ .Values.services.cart.name }}:{{ .Values.services.cart.port }}/api/cart
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.payment.name }}
+  labels:
+    app: {{ .Values.services.payment.name }}
+spec:
+  ports:
+    - port: {{ .Values.services.payment.port }}
+      targetPort: {{ .Values.services.payment.port }}
+      nodePort: {{ .Values.services.payment.nodePort }}
+  selector:
+    app: {{ .Values.services.payment.name }}
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.services.payment.name }}-secret
+type: Opaque
+data:
+  JWT_SECRET: {{ .Values.jwtSecret | b64enc }}
+

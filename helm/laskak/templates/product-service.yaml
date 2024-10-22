@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.product.name }}
+  labels:
+    app: {{ .Values.services.product.name }}
+spec:
+  replicas: {{ .Values.services.product.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.product.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.product.name }}
+    spec:
+      containers:
+        - name: {{ .Values.services.product.name }}
+          image: {{ .Values.services.product.image.repository }}:{{ .Values.services.product.image.tag }}
+          ports:
+            - containerPort: {{ .Values.services.product.port }}
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.services.product.name }}-secret
+                  key: JWT_SECRET
+            - name: PORT
+              value: "{{ .Values.services.product.port }}"
+            - name: POSTGRES_URI
+              value: {{ .Values.global.postgresql.uri }}/product_db
+            - name: RABBITMQ_URL
+              value: {{ .Values.global.rabbitmq.url }}
+            - name: DEFAULT_DB_URI
+              value: {{ .Values.global.postgresql.uri }}/postgres
+            - name: ORDER_SERVICE_URL
+              value: http://{{ .Values.services.order.name }}:{{ .Values.services.order.port }}/api/order
+            - name: PAYMENT_SERVICE_URL
+              value: http://{{ .Values.services.payment.name }}:{{ .Values.services.payment.port }}/api/payment
+            - name: CART_SERVICE_URL
+              value: http://{{ .Values.services.cart.name }}:{{ .Values.services.cart.port }}/api/cart
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.product.name }}
+  labels:
+    app: {{ .Values.services.product.name }}
+spec:
+  ports:
+    - port: {{ .Values.services.product.port }}
+      targetPort: {{ .Values.services.product.port }}
+      nodePort: {{ .Values.services.product.nodePort }}
+  selector:
+    app: {{ .Values.services.product.name }}
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.services.product.name }}-secret
+type: Opaque
+data:
+  JWT_SECRET: {{ .Values.jwtSecret | b64enc }}
+

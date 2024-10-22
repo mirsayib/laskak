@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.cart.name }}
+  labels:
+    app: {{ .Values.services.cart.name }}
+spec:
+  replicas: {{ .Values.services.cart.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.cart.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.cart.name }}
+    spec:
+      containers:
+        - name: {{ .Values.services.cart.name }}
+          image: {{ .Values.services.cart.image.repository }}:{{ .Values.services.cart.image.tag }}
+          ports:
+            - containerPort: {{ .Values.services.cart.port }}
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.services.cart.name }}-secret
+                  key: JWT_SECRET
+            - name: PORT
+              value: "{{ .Values.services.cart.port }}"
+            - name: POSTGRES_URI
+              value: {{ .Values.global.postgresql.uri }}/cart_db
+            - name: RABBITMQ_URL
+              value: {{ .Values.global.rabbitmq.url }}
+            - name: DEFAULT_DB_URI
+              value: {{ .Values.global.postgresql.uri }}/postgres
+            - name: PRODUCT_SERVICE_URL
+              value: http://{{ .Values.services.product.name }}:{{ .Values.services.product.port }}/api/products
+            - name: ORDER_SERVICE_URL
+              value: http://{{ .Values.services.order.name }}:{{ .Values.services.order.port }}/api/order
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.cart.name }}
+  labels:
+    app: {{ .Values.services.cart.name }}
+spec:
+  selector:
+    app: {{ .Values.services.cart.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.services.cart.port }}
+      targetPort: {{ .Values.services.cart.port }}
+      nodePort: {{ .Values.services.cart.nodePort }}
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.services.cart.name }}-secret
+type: Opaque
+data:
+  JWT_SECRET: {{ .Values.jwtSecret | b64enc }}

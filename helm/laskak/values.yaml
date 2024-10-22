@@ -1,0 +1,75 @@
+global:
+  postgresql:
+    uri: postgres://sayib:Sinat@postgresql:5432
+  rabbitmq:
+    url: amqp://rabbitmq:5672
+
+services:
+  user:
+    name: user-service
+    port: 5000
+    nodePort: 30000
+    replicas: 1
+    image:
+      repository: takemi085/laskak
+      tag: user-service
+  product:
+    name: product-service
+    port: 5001
+    nodePort: 30001
+    replicas: 1
+    image:
+      repository: takemi085/laskak
+      tag: product-service
+  cart:
+    name: shopping-cart-service
+    port: 5002
+    nodePort: 30002
+    replicas: 1
+    image:
+      repository: takemi085/laskak
+      tag: shopping-cart-service
+  order:
+    name: order-service
+    port: 5003
+    nodePort: 30003
+    replicas: 1
+    image:
+      repository: takemi085/laskak
+      tag: order-service
+  payment:
+    name: payment-service
+    port: 5004
+    nodePort: 30004
+    replicas: 1
+    image:
+      repository: takemi085/laskak
+      tag: payment-service
+
+postgresql:
+  name: postgresql
+  enabled: true
+  port: 5432
+  replicas: 1
+  user: sayib
+  password: Sinat
+  image:
+    repository: takemi085/laskak
+    tag: postgresql
+  persistence:
+    size: 1Gi
+
+rabbitmq:
+  name: rabbitmq
+  enabled: true
+  managementPort: 15672
+  port: 5672
+  replicas: 1
+  erlangCookie: "XAHKJLWQOPRUSDFJKL23456ASDFGH789"
+  image:
+    repository: rabbitmq
+    tag: 3-management
+  persistence:
+    size: 1Gi
+
+jwtSecret: OGY0YjZjMmExZTlkN2YzYjVhMGM4ZTZkNGEyYjBmMWU5YzdkNWEzYjFmMGU4YTZjNGQy

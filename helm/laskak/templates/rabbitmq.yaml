@@ -1,0 +1,56 @@
+{{- if .Values.rabbitmq.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.rabbitmq.name }}
+spec:
+  serviceName: "{{ .Values.rabbitmq.name }}"
+  replicas: {{ .Values.rabbitmq.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.rabbitmq.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.rabbitmq.name }}
+    spec:
+      containers:
+      - name: {{ .Values.rabbitmq.name }}
+        image: {{ .Values.rabbitmq.image.repository }}:{{ .Values.rabbitmq.image.tag }}
+        ports:
+        - containerPort: {{ .Values.rabbitmq.port }}
+        - containerPort: {{ .Values.rabbitmq.managementPort }}
+        env:
+        - name: RABBITMQ_ERLANG_COOKIE
+          value: {{ .Values.rabbitmq.erlangCookie }}
+        volumeMounts:
+        - name: rabbitmq-data
+          mountPath: /var/lib/rabbitmq
+  volumeClaimTemplates:
+  - metadata:
+      name: rabbitmq-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.rabbitmq.persistence.size }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.rabbitmq.name }}
+  labels:
+    app: {{ .Values.rabbitmq.name }}
+spec:
+  ports:
+  - port: {{ .Values.rabbitmq.port }}
+    name: amqp
+  - port: {{ .Values.rabbitmq.managementPort }}
+    name: management
+  clusterIP: None
+  selector:
+    app: {{ .Values.rabbitmq.name }}
+{{- end }}
+
