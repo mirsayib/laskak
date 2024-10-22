@@ -54,10 +54,9 @@ spec:
   ports:
     - port: {{ .Values.services.payment.port }}
       targetPort: {{ .Values.services.payment.port }}
-      nodePort: {{ .Values.services.payment.nodePort }}
   selector:
     app: {{ .Values.services.payment.name }}
-  type: NodePort
+  type: ClusterIP
 
 ---
 

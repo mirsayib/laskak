@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |
+    events {}
+    http {
+        upstream user_service {
+            server {{ .Values.services.user.name }}:{{ .Values.services.user.port }};
+        }
+
+        upstream product_service {
+            server {{ .Values.services.product.name }}:{{ .Values.services.product.port }};
+        }
+
+        upstream order_service {
+            server {{ .Values.services.order.name }}:{{ .Values.services.order.port }};
+        }
+
+        upstream payment_service {
+            server {{ .Values.services.payment.name }}:{{ .Values.services.payment.port }};
+        }
+
+        upstream cart_service {
+            server {{ .Values.services.cart.name }}:{{ .Values.services.cart.port }};
+        }
+
+        server {
+            listen 80;
+
+            location /api/users {
+                proxy_pass http://user_service;
+            }
+
+            location /api/products {
+                proxy_pass http://product_service;
+            }
+
+            location /api/order {
+                proxy_pass http://order_service;
+            }
+
+            location /api/payment {
+                proxy_pass http://payment_service;
+            }
+
+            location /api/cart {
+                proxy_pass http://cart_service;
+            }
+        }
+    }

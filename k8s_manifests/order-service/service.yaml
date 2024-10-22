@@ -8,7 +8,6 @@ spec:
   ports:
     - port: 5003
       targetPort: 5003
-      nodePort: 30003
   selector:
     app: order-service
-  type: NodePort
+  type: ClusterIP

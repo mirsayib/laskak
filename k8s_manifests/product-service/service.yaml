@@ -8,7 +8,6 @@ spec:
   ports:
     - port: 5001
       targetPort: 5001
-      nodePort: 30001
   selector:
     app: product-service
-  type: NodePort
+  type: ClusterIP

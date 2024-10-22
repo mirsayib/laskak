@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.nginx.name }}
+spec:
+  replicas: {{ .Values.nginx.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.nginx.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.nginx.name }}
+    spec:
+      containers:
+        - name: {{ .Values.nginx.name }}  
+          image: nginx:latest
+          ports:
+            - containerPort: {{ .Values.nginx.port }}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.nginx.name }}
+spec:
+  selector:
+    app: {{ .Values.nginx.name }}
+  ports:
+    - port: {{ .Values.nginx.port }}
+      targetPort: {{ .Values.nginx.port }}
+      nodePort: {{ .Values.nginx.nodePort }}
+  type: NodePort

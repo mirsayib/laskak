@@ -8,7 +8,6 @@ spec:
   ports:
     - port: 5002
       targetPort: 5002
-      nodePort: 30002
   selector:
     app: shopping-cart-service
-  type: NodePort
+  type: ClusterIP

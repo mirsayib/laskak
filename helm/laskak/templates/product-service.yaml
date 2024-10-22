@@ -52,10 +52,9 @@ spec:
   ports:
     - port: {{ .Values.services.product.port }}
       targetPort: {{ .Values.services.product.port }}
-      nodePort: {{ .Values.services.product.nodePort }}
   selector:
     app: {{ .Values.services.product.name }}
-  type: NodePort
+  type: ClusterIP
 
 ---
 

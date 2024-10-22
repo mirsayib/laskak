@@ -53,8 +53,7 @@ spec:
     - protocol: TCP
       port: {{ .Values.services.cart.port }}
       targetPort: {{ .Values.services.cart.port }}
-      nodePort: {{ .Values.services.cart.nodePort }}
-  type: NodePort
+  type: ClusterIP
 
 ---
 

@@ -54,10 +54,9 @@ spec:
   ports:
     - port: {{ .Values.services.user.port }}
       targetPort: {{ .Values.services.user.port }}
-      nodePort: {{ .Values.services.user.nodePort }}
   selector:
     app: {{ .Values.services.user.name }}
-  type: NodePort
+  type: ClusterIP
 
 ---
 

@@ -57,8 +57,7 @@ spec:
     - protocol: TCP
       port: {{ .Values.services.order.port }}
       targetPort: {{ .Values.services.order.port }}
-      nodePort: {{ .Values.services.order.nodePort }}
-  type: NodePort
+  type: ClusterIP
 
 ---
 
