@@ -1,16 +1,2 @@
 .DS_Store
-
-
-podman tag localhost/services_product-service:latest takemi085/laskak:product-service:latest
-podman tag localhost/services_order-service:latest takemi085/laskak:order-service:latest
-podman tag localhost/services_payment-service:latest takemi085/laskak:payment-service:latest
-podman tag localhost/services_shopping-cart-service:latest takemi085/laskak:shopping-cart-service:latest
-podman tag localhost/services_user-service:latest takemi085/laskak:user-service:latest
-
-
-
-podman push takemi085/laskak:product-service
-podman push takemi085/laskak:order-service
-podman push takemi085/laskak:payment-service
-podman push takemi085/laskak:shopping-cart-service
-podman push takemi085/laskak:user-service
+rabbitmq_data
