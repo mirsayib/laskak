@@ -5,10 +5,6 @@
 # Base image name
 BASE_IMAGE_NAME="takemi085/laskak"
 
-# Podman login
-echo "Logging into Podman registry..."
-podman login docker.io
-
 # Build and tag custom postgres image in one command
 podman build -t "docker.io/takemi085/laskak:postgresql" -f "services/dockerfiles/postgres/Dockerfile"
 

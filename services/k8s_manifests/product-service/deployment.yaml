@@ -5,7 +5,7 @@ metadata:
   labels:
     app: product-service
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: product-service
@@ -26,7 +26,7 @@ spec:
                   name: product-secret
                   key: JWT_SECRET
             - name: PORT
-              value: 5001
+              value: "5001"
             - name: POSTGRES_URI
               valueFrom:
                 configMapKeyRef:

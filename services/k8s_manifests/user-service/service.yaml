@@ -8,6 +8,7 @@ spec:
   ports:
     - port: 5000
       targetPort: 5000
+      nodePort: 30000
   selector:
     app: user-service
-  type: ClusterIP
+  type: NodePort
