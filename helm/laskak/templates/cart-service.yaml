@@ -37,6 +37,11 @@ spec:
               value: http://{{ .Values.services.product.name }}:{{ .Values.services.product.port }}/api/products
             - name: ORDER_SERVICE_URL
               value: http://{{ .Values.services.order.name }}:{{ .Values.services.order.port }}/api/order
+          resources:
+            requests:
+              cpu: 200m
+            limits:
+              cpu: 400m
 
 ---
 
@@ -64,3 +69,26 @@ metadata:
 type: Opaque
 data:
   JWT_SECRET: {{ .Values.jwtSecret | b64enc }}
+
+---
+
+{{- if .Values.services.cart.hpaEnabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.services.cart.name }}-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.services.cart.name }}
+  minReplicas: {{ .Values.services.cart.minReplicas | default 1 }}
+  maxReplicas: {{ .Values.services.cart.maxReplicas | default 5 }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.services.cart.targetCPUUtilizationPercentage | default 80 }}
+{{- end }}

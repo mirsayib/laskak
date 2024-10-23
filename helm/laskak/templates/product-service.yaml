@@ -66,3 +66,25 @@ type: Opaque
 data:
   JWT_SECRET: {{ .Values.jwtSecret | b64enc }}
 
+---
+
+{{- if .Values.services.product.hpaEnabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.services.product.name }}-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.services.product.name }}
+  minReplicas: {{ .Values.services.product.minReplicas | default 1 }}
+  maxReplicas: {{ .Values.services.product.maxReplicas | default 5 }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.services.product.targetCPUUtilizationPercentage | default 80 }}
+{{- end }}

@@ -13,6 +13,10 @@ services:
     image:
       repository: takemi085/laskak
       tag: user-service
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    hpaEnabled: true
   product:
     name: product-service
     port: 5001
@@ -21,6 +25,10 @@ services:
     image:
       repository: takemi085/laskak
       tag: product-service
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    hpaEnabled: true
   cart:
     name: shopping-cart-service
     port: 5002
@@ -29,6 +37,10 @@ services:
     image:
       repository: takemi085/laskak
       tag: shopping-cart-service
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    hpaEnabled: true
   order:
     name: order-service
     port: 5003
@@ -37,6 +49,10 @@ services:
     image:
       repository: takemi085/laskak
       tag: order-service
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    hpaEnabled: true
   payment:
     name: payment-service
     port: 5004
@@ -45,7 +61,10 @@ services:
     image:
       repository: takemi085/laskak
       tag: payment-service
-
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    hpaEnabled: true
 postgresql:
   name: postgresql
   enabled: true
@@ -79,3 +98,5 @@ nginx:
   replicas: 1
   nodePort: 30000
 jwtSecret: OGY0YjZjMmExZTlkN2YzYjVhMGM4ZTZkNGEyYjBmMWU5YzdkNWEzYjFmMGU4YTZjNGQy
+metricsServer:
+  enabled: false
